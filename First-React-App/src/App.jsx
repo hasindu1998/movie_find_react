@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import Search from "./components/Search";
+import Spinner from "./components/Spinner";
 
 const BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -17,8 +18,14 @@ const App = () => {
 
   const [searchTerm, setsearchTerm] = useState('');
   const [errorMessage, seterrorMessage] = useState('');
+  const [movieList, setmovieList] = useState([]);
+  const [isLoading, setisLoading] = useState(false)
+  ;
 
   const fetchMovies = async() => {
+    setisLoading(true);
+    seterrorMessage('');
+
     try{
       const endPoint = `${BASE_URL}/discover/movie?sort_by=popularity.desc`;
 
@@ -30,11 +37,19 @@ const App = () => {
 
       const data = await response.json();
 
-      console.log(data);
+      if(data.response == false){
+        seterrorMessage(data.error || 'Failed to fetch');
+        setmovieList([]);
+        return;
+      }
+
+      setmovieList(data.results || []);
 
     }catch(error){
       console.log('Error Movies: ${error}');
       seterrorMessage('Movie has an error, Please try again');
+    }finally{
+      setisLoading(false);
     }
   }
 
@@ -57,13 +72,21 @@ const App = () => {
         </header>
 
         <section>
-          <h2>All Movies</h2>
+          <h2 className="all-movies text-2xl font-semibold mt-8 mb-4">All Movies</h2>
 
-
-          {errorMessage && <p className="text-red-800">{errorMessage}</p>}
+          {isLoading? (
+            <Spinner/>
+          ): errorMessage? (
+            <p className="text-red-600">{errorMessage}</p>
+          ):(
+            <div className="grid grid-cols-4" >
+              {movieList.map((movie) =>(
+                <div key={movie.id} className="text-white">{movie.title}</div>
+              ))}
+            </div>
+          )}
+          
         </section>
-        
-        
       </div>
     </main>
   )
