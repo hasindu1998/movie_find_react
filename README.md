@@ -25,3 +25,21 @@ A ReactJS application to search and explore movies using a sleek and responsive 
 ```bash
 git clone https://github.com/your-username/movie-finder-app.git
 ```
+
+### 2. Navigate to the project directory
+
+```bash
+cd First-React-App
+```
+
+### 3. Install dependencies:
+
+```bash
+npm install
+```
+
+### 4. Run the application:
+
+```bash
+npm run dev
+```
