@@ -6,7 +6,7 @@ const Search = ({searchTerm, setsearchTerm}) =>{
             <input
              type="text" 
              placeholder="Search a movie" 
-             className="bg-gray-600 pl-2 pt-1 pb-1 rounded-2xl" 
+             className="bg-gray-600 pl-2 pt-1 pb-1 rounded-2xl w-68" 
              value={searchTerm}
              onChange={(e) => setsearchTerm(e.target.value)}
             />

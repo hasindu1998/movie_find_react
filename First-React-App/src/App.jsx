@@ -1,9 +1,9 @@
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
 
-const BASE_URL = "https://api.themoviedb.org/3";
+const BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 const API_OPTION = {
@@ -20,15 +20,16 @@ const App = () => {
   const [searchTerm, setsearchTerm] = useState('');
   const [errorMessage, seterrorMessage] = useState('');
   const [movieList, setmovieList] = useState([]);
-  const [isLoading, setisLoading] = useState(false)
-  ;
+  const [isLoading, setisLoading] = useState(false);
 
-  const fetchMovies = async() => {
+  const fetchMovies = async(query = '') => {
     setisLoading(true);
     seterrorMessage('');
 
     try{
-      const endPoint = `${BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      const endPoint = query 
+      ? `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+      : `${BASE_URL}/discover/movie?sort_by=popularity.desc`;
 
       const response = await fetch(endPoint, API_OPTION);
 
@@ -55,8 +56,8 @@ const App = () => {
   }
 
   useEffect(() => {
-    fetchMovies();
-  }, [])
+    fetchMovies(searchTerm);
+  }, [searchTerm])
 
   return (
     <main className="flex justify-center">
@@ -73,14 +74,14 @@ const App = () => {
         </header>
 
         <section>
-          <h2 className="all-movies text-2xl font-semibold mt-8 mb-4">All Movies</h2>
+          <h2 className="all-movies text-4xl font-semibold mt-8 mb-4 text-left ml-20">All Movies</h2>
 
           {isLoading? (
             <Spinner/>
           ): errorMessage? (
             <p className="text-red-600">{errorMessage}</p>
           ):(
-            <div className="grid lg:grid-cols-4 sm:grid-cols-2" >
+            <div className="grid lg:grid-cols-4 sm:grid-cols-2 p-8" >
               {movieList.map((movie) =>(
                 <MovieCard key={movie.id} movie={movie}/>
               ))}
