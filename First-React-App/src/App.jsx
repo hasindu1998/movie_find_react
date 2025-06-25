@@ -3,8 +3,8 @@ import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
 
-const BASE_URL = import.meta.env.VITE_TMDB_BASE_URL;
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const BASE_URL = 'https://api.themoviedb.org/3';
+const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhODRkNWY4ZmZiMmY1M2FiNTM1YWU2YTZkOGUzYjYzYyIsIm5iZiI6MTc1MDM0MDcwOC41MzMsInN1YiI6IjY4NTQxNDY0NjUwMzNiOTBhZDc3ZDAyYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.__prSZn960ySSebok3ns2NCgvPjID3wW1mhSxOhT3uk';
 
 const API_OPTION = {
   method: 'GET',
