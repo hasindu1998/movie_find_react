@@ -2,62 +2,52 @@ import { useEffect, useState } from "react"
 import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
-
-const BASE_URL = 'https://api.themoviedb.org/3';
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhODRkNWY4ZmZiMmY1M2FiNTM1YWU2YTZkOGUzYjYzYyIsIm5iZiI6MTc1MDM0MDcwOC41MzMsInN1YiI6IjY4NTQxNDY0NjUwMzNiOTBhZDc3ZDAyYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.__prSZn960ySSebok3ns2NCgvPjID3wW1mhSxOhT3uk';
-
-const API_OPTION = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${API_KEY}`
-  }
-};
-
+import { fetchMovies, searchMovies } from "./service/api";
 
 const App = () => {
 
   const [searchTerm, setsearchTerm] = useState('');
-  const [errorMessage, seterrorMessage] = useState('');
+  const [errorMessage, seterrorMessage] = useState(null);
   const [movieList, setmovieList] = useState([]);
   const [isLoading, setisLoading] = useState(false);
 
-  const fetchMovies = async(query = '') => {
+  useEffect(() => {
+    const loadPopularMovies = async () =>{
+       try{
+        const popularMovies = await fetchMovies();
+        setmovieList(popularMovies);
+       }catch(error){
+        console.log(error);
+        seterrorMessage("Failed to load movies");
+
+       }finally{
+          setisLoading(false);
+       }
+    }
+
+    loadPopularMovies();
+  }, []);
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if(!searchTerm.trim()) return;
+    if(isLoading) return;
+
     setisLoading(true);
-    seterrorMessage('');
-
-    try{
-      const endPoint = query 
-      ? `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-      : `${BASE_URL}/discover/movie?sort_by=popularity.desc`;
-
-      const response = await fetch(endPoint, API_OPTION);
-
-      if(!response.ok){
-        throw new Error('Cannot Fetch Movie');
-      }
-
-      const data = await response.json();
-
-      if(data.response == false){
-        seterrorMessage(data.error || 'Failed to fetch');
-        setmovieList([]);
-        return;
-      }
-
-      setmovieList(data.results || []);
-
-    }catch(error){
-      console.log('Error Movies: ${error}');
-      seterrorMessage('Movie has an error, Please try again');
+    try {
+      const searchResults = await searchMovies(searchTerm);
+      setmovieList(searchResults);
+      seterrorMessage(null);
+    } catch (error) {
+      console.log(error);
+      seterrorMessage("Failed to search the movie");
     }finally{
       setisLoading(false);
     }
+
+    setsearchTerm("");
   }
 
-  useEffect(() => {
-    fetchMovies(searchTerm);
-  }, [searchTerm])
 
   return (
     <main className="flex justify-center">
@@ -70,7 +60,21 @@ const App = () => {
             <span className="bg-linear-to-r from-[#D6C7FF] to-[#AB8BFF] bg-clip-text text-transparent mt-20"> Movies</span>
           </h1>
           
-          <Search searchTerm = {searchTerm} setsearchTerm = {setsearchTerm} />
+          <div className="flex justify-center items-center mt-10">
+            <input
+             type="text" 
+             placeholder="Search a movie" 
+             className="bg-gray-600 pl-2 pt-1 pb-1 rounded-2xl w-68" 
+             value={searchTerm}
+             onChange={(e) => setsearchTerm(e.target.value)}
+            />
+            <button 
+            className="bg-purple-500 text-white font-semibold pt-1 pb-1 pr-3 pl-3 rounded-md ml-6 cursor-pointer"
+            type="submit"
+            onClick={handleSearch}
+            >Search</button>
+          </div>
+
         </header>
 
         <section>
